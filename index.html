@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <style>
+      body {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        margin: 0;
+        background-color: #ffffff;
+      }
+
+      #game-container {
+        text-align: center;
+      }
+
+      #canvas {
+        width: 500px;
+        height: 300px;
+        border: 1px solid black;
+        background-color: green; 
+      }
+    </style>
+  </head>
+  <body>
+    <div id="game-container">
+      <h1 id="header">Golf Game</h1>
+      <canvas id="canvas"></canvas>
+      <button id="retryButton" style="display: none;">Retry</button>
+    </div>
+
+    <script>
+      const canvas = document.getElementById('canvas');
+      const ctx = canvas.getContext('2d');
+      const header = document.getElementById('header');
+      const retryButton = document.getElementById('retryButton');
+
+      const ballRadius = 10;
+      let ballX = canvas.width / 2;
+      let ballY = canvas.height / 2;
+      const holeX = canvas.width - 20;
+      const holeY = canvas.height - 20;
+      let holeHit = false;
+
+      function drawBall() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        ctx.beginPath();
+        ctx.arc(ballX, ballY, ballRadius, 0, Math.PI * 2);
+        ctx.fillStyle = 'white';
+        ctx.fill();
+        ctx.closePath();
+
+        if (holeHit) {
+          ctx.fillStyle = 'black';
+          ctx.fillRect(holeX, holeY, 20, 20);
+          header.textContent = 'You have Hit the Goal!!!';
+          retryButton.style.display = 'block';
+        } else {
+          ctx.fillStyle = 'black';
+          ctx.fillRect(holeX, holeY, 20, 20);
+        }
+      }
+
+      function checkCollision() {
+        if (
+          ballX >= holeX - ballRadius &&
+          ballX <= holeX + ballRadius &&
+          ballY >= holeY - ballRadius &&
+          ballY <= holeY + ballRadius
+        ) {
+          holeHit = true;
+        }
+
+        
+        const distance = Math.sqrt(
+          (ballX - holeX) * (ballX - holeX) + (ballY - holeY) * (ballY - holeY)
+        );
+        if (distance <= ballRadius) {
+          ballX = -ballRadius;
+          ballY = -ballRadius;
+        }
+      }
+
+      function updateBallPosition(keyCode) {
+        if (keyCode === 37 && ballX > ballRadius) {
+          ballX -= 10;
+        } else if (keyCode === 39 && ballX < canvas.width - ballRadius) {
+          ballX += 10;
+        } else if (keyCode === 38 && ballY > ballRadius) {
+          ballY -= 10;
+        } else if (keyCode === 40 && ballY < canvas.height - ballRadius) {
+          ballY += 10;
+        }
+
+        checkCollision();
+        drawBall();
+      }
+
+      function resetGame() {
+        ballX = canvas.width / 2;
+        ballY = canvas.height / 2;
+        holeHit = false;
+        retryButton.style.display = 'none';
+        header.textContent = 'Golf Game';
+        drawBall();
+      }
+
+      document.addEventListener('keydown', function (event) {
+        updateBallPosition(event.keyCode);
+      });
+
+      retryButton.addEventListener('click', resetGame);
+
+      drawBall();
+    </script>
+  </body>
+</html>
